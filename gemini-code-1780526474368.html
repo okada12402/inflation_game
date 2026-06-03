@@ -1,0 +1,1582 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inflation RPG - Arsenal Expansion v7.3 -</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* MODERN MINIMALIST DESIGN SYSTEM (16:9 Single Screen Optimized) */
+        :root {
+            --bg-body: #09090b;
+            --bg-container: #121214;
+            --bg-surface: #1a1a1e;
+            --bg-surface-accent: #1e1e24;
+            --bg-progress: #27272a;
+            --bg-tab-active: #2c2c35;
+            --bg-btn-sec: #27272a;
+            --bg-btn-sec-hover: #3f3f46;
+            --text-main: #e4e4e7;
+            --text-muted: #a1a1aa;
+            --text-dark: #ffffff;
+            --text-btn-pri: #000000;
+            --bg-btn-pri: #ffffff;
+            --bg-btn-pri-hover: #e4e4e7;
+            --border-color: rgba(255, 255, 255, 0.05);
+            --border-card: rgba(255, 255, 255, 0.02);
+            --bg-overlay: rgba(9, 9, 11, 0.95);
+            --bg-modal: #1c1c21;
+            --input-bg: #09090b;
+            --input-border: rgba(255, 255, 255, 0.1);
+            --accent-mint: #2ecc71;
+            --accent-red: #ef4444;
+            --accent-blue: #3b82f6;
+            --accent-purple: #9b59b6;
+            --spotlight-shadow: 0 0 0 9999px rgba(9, 9, 11, 0.75);
+        }
+
+        [data-theme="light"] {
+            --bg-body: #f4f4f5;
+            --bg-container: #ffffff;
+            --bg-surface: #f4f4f5;
+            --bg-surface-accent: #ebebef;
+            --bg-progress: #e4e4e7;
+            --bg-tab-active: #e4e4e7;
+            --bg-btn-sec: #e4e4e7;
+            --bg-btn-sec-hover: #d4d4d8;
+            --text-main: #27272a;
+            --text-muted: #71717a;
+            --text-dark: #09090b;
+            --text-btn-pri: #ffffff;
+            --bg-btn-pri: #09090b;
+            --bg-btn-pri-hover: #27272a;
+            --border-color: rgba(0, 0, 0, 0.12);
+            --border-card: rgba(0, 0, 0, 0.04);
+            --bg-overlay: rgba(255, 255, 255, 0.95);
+            --bg-modal: #ffffff;
+            --input-bg: #f4f4f5;
+            --input-border: rgba(0, 0, 0, 0.15);
+            --accent-mint: #27ae60;
+            --spotlight-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.5);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            -webkit-font-smoothing: antialiased;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        /* 🖥️ 16:9 アスペクト比コンテナ */
+        .game-container {
+            width: 100%;
+            max-width: 960px; 
+            aspect-ratio: 16 / 9; 
+            background-color: var(--bg-container);
+            border-radius: 24px;
+            padding: 24px;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
+            border: 1px solid var(--border-color);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+
+        /* トースト通知 */
+        .toast-notification {
+            position: absolute;
+            top: 16px; left: 16px; right: 16px;
+            background: var(--accent-mint);
+            color: #ffffff;
+            padding: 12px 16px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 600;
+            text-align: center;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+            z-index: 600;
+            display: none;
+            animation: slideDownFade 0.4s ease forwards;
+        }
+
+        @keyframes slideDownFade {
+            from { transform: translateY(-10px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        /* HEADER */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .header-title h1 {
+            font-size: 20px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            color: var(--text-dark);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .phase-badge {
+            font-size: 12px;
+            color: var(--text-muted);
+            background: var(--bg-surface);
+            padding: 2px 10px;
+            border-radius: 20px;
+            font-weight: 500;
+        }
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .gold-display {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--accent-mint);
+            font-family: monospace;
+        }
+
+        /* メインビューポート */
+        .main-viewport {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+        }
+
+        /* 🏠 【画面A】ホーム・拠点ビュー */
+        #hub-screen {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            min-height: 0;
+            position: relative;
+        }
+
+        .hub-top-layout {
+            display: grid;
+            grid-template-columns: 240px 1fr;
+            gap: 20px;
+            margin-bottom: 12px;
+        }
+
+        .player-profile-box {
+            background: var(--bg-surface);
+            border-radius: 12px;
+            padding: 12px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid var(--border-card);
+        }
+        .profile-meta .title-label {
+            font-size: 11px;
+            color: var(--text-muted);
+            display: block;
+            margin-bottom: 2px;
+        }
+        .profile-meta .name-label {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 6px;
+            background: var(--bg-surface);
+            padding: 4px;
+            border-radius: 10px;
+        }
+        .tab-btn {
+            flex: 1;
+            padding: 8px;
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            font-weight: 600;
+            border-radius: 7px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 13px;
+            text-align: center;
+        }
+        .tab-btn.active { background: var(--bg-tab-active); color: var(--text-dark); }
+
+        .hub-content-scroll {
+            flex: 1;
+            overflow-y: auto;
+            margin-bottom: 16px;
+            padding-right: 4px;
+        }
+
+        .scene { display: none; width: 100%; }
+        .scene.active { display: block; }
+
+        /* STATS GRID */
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+        }
+        .stat-card {
+            background: var(--bg-surface);
+            padding: 14px 16px;
+            border-radius: 14px;
+            border: 1px solid var(--border-card);
+            position: relative;
+        }
+        .stat-card.span-2 { grid-column: span 2; }
+        .stat-card .label { font-size: 11px; color: var(--text-muted); font-weight: 500; }
+        .stat-card .value { font-size: 17px; font-weight: 600; margin-top: 4px; font-family: monospace; color: var(--text-dark); }
+        
+        .progress-container { height: 6px; background: var(--bg-progress); border-radius: 3px; margin-top: 8px; overflow: hidden; }
+        .progress-fill { height: 100%; width: 100%; transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .hp-bar { background: var(--accent-red); }
+        .mp-bar { background: var(--accent-blue); }
+
+        /* UPGRADES LIST */
+        .upgrade-grid { 
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        .upgrade-item {
+            background: var(--bg-surface);
+            border-radius: 12px;
+            padding: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid var(--border-card);
+        }
+        .upgrade-info h3 { font-size: 13px; font-weight: 600; color: var(--text-dark); }
+        .upgrade-info p { font-size: 11px; color: var(--text-muted); margin-top: 1px; }
+        .upgrade-info .lvl-tag { font-size: 10px; color: var(--accent-mint); font-weight: 700; margin-top: 4px; display: inline-block; background: rgba(46, 204, 113, 0.1); padding: 1px 6px; border-radius: 4px; }
+        .upgrade-action { text-align: right; }
+        .cost-tag { color: var(--text-dark); font-weight: 600; font-size: 12px; display: block; margin-bottom: 4px; font-family: monospace; }
+
+        /* STORE VIEW SPECIFIC */
+        .store-banner {
+            background: linear-gradient(135deg, rgba(155, 89, 182, 0.1) 0%, rgba(59, 130, 246, 0.05) 100%);
+            border: 1px solid rgba(155, 89, 182, 0.2);
+            border-radius: 14px;
+            padding: 16px;
+            margin-bottom: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .store-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+        .store-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-card);
+            border-radius: 14px;
+            padding: 16px;
+            display: flex;
+            gap: 16px;
+            align-items: center;
+        }
+        .store-item-icon {
+            font-size: 36px;
+            background: var(--input-bg);
+            width: 64px;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+        }
+        .store-item-details { flex: 1; }
+        .store-item-details h3 { font-size: 14px; font-weight: 600; color: var(--text-dark); }
+        .store-item-details p { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+
+        /* 拠点画面内・右下配置用コンテナとルールリンクボタン */
+        .hub-fixed-footer {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 12px;
+            padding-top: 12px;
+            border-top: 1px solid var(--border-color);
+            position: relative;
+        }
+        .rule-trigger-link {
+            position: absolute;
+            right: 0;
+            top: -28px;
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            font-size: 11px;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            text-decoration: underline;
+            transition: color 0.2s;
+        }
+        .rule-trigger-link:hover { color: var(--accent-mint); }
+
+        /* ⚔️ 【画面B】遠征・戦闘専用フルビュー */
+        #combat-screen {
+            display: none; 
+            flex-direction: column;
+            height: 100%;
+            min-height: 0;
+            gap: 16px;
+        }
+
+        .combat-main-stage {
+            display: grid;
+            grid-template-columns: 1.4fr 1fr;
+            gap: 20px;
+            flex: 1;
+            min-height: 0;
+        }
+
+        .combat-left-zone {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .unit-card {
+            background: var(--bg-surface);
+            border-radius: 16px;
+            padding: 20px;
+            border: 1px solid var(--border-card);
+            position: relative;
+        }
+        .unit-card.enemy { border-left: 6px solid var(--accent-red); }
+        .unit-card.player-combat-card { border-left: 6px solid var(--accent-blue); }
+        .unit-header { display: flex; justify-content: space-between; font-size: 12px; color: var(--text-muted); margin-bottom: 8px; font-weight: 500;}
+        .unit-main { display: flex; align-items: center; gap: 20px; }
+        .unit-emoji { font-size: 44px; filter: grayscale(0.2); }
+        .unit-info h2 { font-size: 18px; font-weight: 600; color: var(--text-dark); }
+        
+        .combat-actions-grid { 
+            display: grid; 
+            grid-template-columns: repeat(2, 1fr); 
+            gap: 10px; 
+        }
+
+        .combat-right-zone {
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+        }
+        .log-box {
+            background: var(--bg-body); border-radius: 14px; padding: 16px;
+            font-family: monospace; font-size: 12px; color: var(--text-muted);
+            flex: 1; overflow-y: auto;
+            border: 1px solid var(--border-card);
+            line-height: 1.6;
+            min-height: 0;
+        }
+
+        /* BUTTONS DESIGN */
+        .btn-primary {
+            background: var(--bg-btn-pri); color: var(--text-btn-pri); border: none; padding: 14px;
+            border-radius: 10px; font-weight: 600; cursor: pointer; width: 100%;
+            font-size: 14px; transition: background 0.2s;
+        }
+        .btn-primary:hover { background: var(--bg-btn-pri-hover); }
+        .btn-primary:disabled { background: var(--bg-progress) !important; color: var(--text-muted) !important; cursor: not-allowed; opacity: 0.6; }
+        
+        .btn-secondary {
+            background: var(--bg-btn-sec); border: none; color: var(--text-main);
+            padding: 10px 16px; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 500; transition: background 0.2s;
+        }
+        .btn-secondary:hover { background: var(--bg-btn-sec-hover); }
+        .btn-secondary:disabled { background: var(--bg-progress) !important; color: var(--text-muted) !important; cursor: not-allowed; opacity: 0.6; }
+        
+        .btn-danger { background: rgba(239, 68, 68, 0.1); color: var(--accent-red); }
+        .btn-danger:hover { background: rgba(239, 68, 68, 0.2); }
+
+        /* OVERLAYS & MODALS */
+        .ui-overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--bg-overlay);
+            display: none; flex-direction: column;
+            justify-content: center; align-items: center;
+            z-index: 550; border-radius: 24px;
+            padding: 24px;
+        }
+        .ui-modal {
+            background: var(--bg-modal); width: 100%; max-width: 380px;
+            border-radius: 16px; padding: 20px; border: 1px solid var(--border-color);
+        }
+        .ui-modal h3 { font-size: 16px; font-weight: 600; color: var(--text-dark); margin-bottom: 8px; }
+        .ui-modal p { font-size: 12px; color: var(--text-muted); margin-bottom: 14px; line-height: 1.5; }
+        
+        .ui-input {
+            width: 100%; padding: 12px; background: var(--input-bg); border: 1px solid var(--input-border);
+            border-radius: 8px; color: var(--text-dark); font-size: 14px; margin-bottom: 16px; outline: none;
+        }
+        .ui-textarea {
+            width: 100%; height: 90px; padding: 10px; background: var(--input-bg); border: 1px solid var(--input-border);
+            border-radius: 8px; color: var(--text-dark); font-size: 11px; margin-bottom: 16px; outline: none; resize: none;
+            font-family: monospace; word-break: break-all;
+        }
+        .modal-buttons { display: flex; gap: 8px; justify-content: flex-end; }
+
+        /* 🎰 ガチャ演出 */
+        .gacha-theater {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(5, 5, 8, 0.98); border-radius: 24px; z-index: 700;
+            display: none; flex-direction: column; justify-content: center; align-items: center; padding: 24px; cursor: pointer;
+        }
+        .gacha-theater-hint-text {
+            font-size: 12px; color: #a1a1aa !important; animation: slideDownFade 1s infinite alternate; margin-top: 16px;
+        }
+        .gacha-card-box { width: 180px; height: 260px; perspective: 1000px; margin-bottom: 12px; }
+        .gacha-card-inner {
+            width: 100%; height: 100%; position: relative; transform-style: preserve-3d;
+            transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .gacha-card-inner.flipped { transform: rotateY(180deg); }
+        .gacha-card-face {
+            position: absolute; width: 100%; height: 100%; backface-visibility: hidden;
+            border-radius: 16px; display: flex; flex-direction: column; justify-content: center;
+            align-items: center; border: 2px solid rgba(255, 255, 255, 0.1); box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        .gacha-card-back { background: linear-gradient(135deg, #1e1e24 0%, #09090b 100%) !important; }
+        .gacha-card-back .orb { width: 50px; height: 50px; border-radius: 50px; background: #27272a; border: 1px solid rgba(255,255,255,0.1); }
+        .gacha-card-front { background: #1c1c21 !important; transform: rotateY(180deg); }
+        .gacha-front-name { font-size: 14px; font-weight: 600; color: #ffffff !important; text-align: center; padding: 0 10px; }
+        .gacha-front-stat { font-size: 18px; font-weight: 700; margin-top: 12px; font-family: monospace; color: #ffffff !important; }
+        
+        @keyframes gacha-shaking {
+            0% { transform: translate(0, 0) rotate(0deg); }
+            20% { transform: translate(-2px, 1px) rotate(-1deg); }
+            40% { transform: translate(1px, -1px) rotate(1deg); }
+            60% { transform: translate(-1px, 2px) rotate(0deg); }
+            80% { transform: translate(2px, 1px) rotate(1deg); }
+            100% { transform: translate(0, 0) rotate(0deg); }
+        }
+        .animate-charge { animation: gacha-shaking 0.15s infinite; }
+        .gacha-flash { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #ffffff; border-radius: 24px; opacity: 0; pointer-events: none; z-index: 750; }
+        @keyframes flash-burst { 0% { opacity: 0; } 10% { opacity: 1; } 100% { opacity: 0; } }
+        .animate-flash { animation: flash-burst 0.4s ease-out; }
+
+        /* チュートリアル */
+        .tutorial-highlight { position: relative; z-index: 1002 !important; box-shadow: var(--spotlight-shadow) !important; pointer-events: none; border: 2px solid var(--accent-mint) !important; }
+        .tutorial-box { background: var(--bg-modal); border: 1px solid var(--accent-mint); border-radius: 14px; padding: 18px; width: 360px; z-index: 1005; position: absolute; }
+
+        /* 🎒 兵器庫・所持属性リスト専用スタイル */
+        .inventory-list { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; max-height: 200px; overflow-y: auto; }
+        .inventory-item { display: flex; justify-content: space-between; align-items: center; background: var(--input-bg); padding: 10px 12px; border-radius: 8px; border: 1px solid var(--input-border); gap: 12px; }
+        .inventory-item.equipped { border-color: var(--accent-mint); background: rgba(46, 204, 113, 0.05); }
+        
+        /* 💡 改行バグ修正用スタイル */
+        .equip-status-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 76px; 
+            white-space: nowrap; 
+            text-align: right;
+        }
+        .equipped-badge {
+            font-size: 11px; 
+            color: var(--accent-mint); 
+            font-weight: 700; 
+            background: rgba(46, 204, 113, 0.15);
+            padding: 4px 10px;
+            border-radius: 6px;
+            display: inline-block;
+        }
+
+        /* ℹ️ ルールブックモーダル専用スタイル */
+        .rule-modal-tabs {
+            display: flex; gap: 4px; background: var(--input-bg); padding: 4px; border-radius: 8px; margin-bottom: 12px;
+        }
+        .rule-tab-btn {
+            flex: 1; padding: 6px; border: none; background: transparent; color: var(--text-muted);
+            font-size: 11px; font-weight: 600; border-radius: 6px; cursor: pointer; text-align: center;
+        }
+        .rule-tab-btn.active { background: var(--bg-surface); color: var(--text-dark); }
+        .rule-tab-content { display: none; font-size: 11px; line-height: 1.6; color: var(--text-muted); max-height: 200px; overflow-y: auto; padding-right: 2px; }
+        .rule-tab-content.active { display: block; }
+        .rule-tab-content strong { color: var(--text-dark); }
+        .rule-bullet-list { margin-left: 14px; margin-top: 4px; margin-bottom: 6px; }
+    </style>
+</head>
+<body>
+
+<div class="game-container">
+    <div id="toast-notify" class="toast-notification"></div>
+
+    <div id="gacha-theater" class="gacha-theater" onclick="skipOrCloseGacha()">
+        <div id="gacha-flash" class="gacha-flash"></div>
+        <div class="gacha-card-box">
+            <div id="gacha-card-inner" class="gacha-card-inner">
+                <div class="gacha-card-face gacha-card-back">
+                    <div id="gacha-orb" class="orb"></div>
+                    <div style="font-size: 11px; font-weight: 600; letter-spacing: 2px; margin-top: 16px; color:rgba(255,255,255,0.3);">ENHANCING</div>
+                </div>
+                <div id="gacha-card-front" class="gacha-card-face gacha-card-front">
+                    <div id="gacha-res-rarity" style="font-size: 11px; font-weight: 800; padding: 2px 8px; border-radius: 4px; margin-bottom: 12px;">SUCCESS</div>
+                    <div id="gacha-res-icon" style="font-size: 40px; margin-bottom: 10px;">⚔️</div>
+                    <div id="gacha-res-name" class="gacha-front-name">武器強化</div>
+                    <div id="gacha-res-stat" class="gacha-front-stat">+4 ATK</div>
+                </div>
+            </div>
+        </div>
+        <div id="gacha-theater-hint" class="gacha-theater-hint-text">画面をタップして進む</div>
+    </div>
+
+    <div id="tutorial-overlay" class="ui-overlay" style="background: transparent; z-index: 1000; pointer-events: auto;">
+        <div id="tutorial-card" class="tutorial-box">
+            <h4 id="tut-title" style="font-size:14px; font-weight:700; color:var(--accent-mint); margin-bottom:6px;">💡 チュートリアル</h4>
+            <p id="tut-text" style="font-size:12px; line-height:1.5; margin-bottom:12px;">説明文</p>
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <span id="tut-step" style="font-size:11px; color:var(--text-muted); font-family:monospace;">1 / 4</span>
+                <button class="btn-primary" id="tut-next-btn" style="width: auto; padding: 6px 14px; font-size: 12px;" onclick="nextTutorialStep()">次へ →</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="custom-modal-overlay" class="ui-overlay">
+        <div id="modal-welcome" class="ui-modal" style="display:none; max-width: 360px;">
+            <div style="font-size: 32px; text-align: center; margin-bottom: 8px;">⚔️</div>
+            <h3 style="text-align: center; font-size: 18px;">インフレRPGへようこそ！</h3>
+            <p style="text-align: center; margin-bottom: 16px; color: var(--text-muted);">敵を倒して得た資金で爆発的にステータスを強化し、遥かなる高みを目指すハクスラRPGです。</p>
+            <button class="btn-primary" onclick="startGuidedTutorial('hub')">チュートリアルを開始する</button>
+        </div>
+
+        <div id="modal-name" class="ui-modal" style="display:none;">
+            <h3>勇者の名前変更</h3>
+            <input type="text" id="input-player-name" class="ui-input" maxlength="8">
+            <div class="modal-buttons">
+                <button class="btn-secondary" onclick="closeModal()">キャンセル</button>
+                <button class="btn-primary" style="width:auto; padding:8px 16px;" onclick="confirmRename()">変更する</button>
+            </div>
+        </div>
+
+        <div id="modal-inventory" class="ui-modal" style="display:none;">
+            <h3>🎒 武器属性の一覧・装備変更</h3>
+            <p style="color:var(--text-muted); font-size:12px;">ガチャで一度でも引いた特殊効果や強化武器がすべて保管されています。自由に付け替え可能です。</p>
+            <div id="inventory-container-list" class="inventory-list">
+                </div>
+            <div class="modal-buttons" style="margin-top:14px;">
+                <button class="btn-secondary" style="width:100%;" onclick="closeModal()">一覧を閉じる</button>
+            </div>
+        </div>
+
+        <div id="modal-game-rules" class="ui-modal" style="display:none; max-width: 440px;">
+            <h3 style="display:flex; align-items:center; gap:6px; font-size:15px;">ℹ️ インフレRPG公式規約・ルール</h3>
+            <p style="font-size:11px; color:var(--text-muted); margin-bottom:10px;">当世界線における秩序維持のための基本ガイドラインです。</p>
+            
+            <div class="rule-modal-tabs">
+                <button class="rule-tab-btn active" id="r-tab-summary" onclick="switchRuleTab('summary')">概要</button>
+                <button class="rule-tab-btn" id="r-tab-laws" onclick="switchRuleTab('laws')">基本ルール</button>
+                <button class="rule-tab-btn" id="r-tab-howto" onclick="switchRuleTab('howto')">やり方</button>
+                <button class="rule-tab-btn" id="r-tab-penalty" onclick="switchRuleTab('penalty')" style="color:var(--accent-red);">⚠️ 違法ペナルティ</button>
+            </div>
+
+            <div id="rule-content-summary" class="rule-tab-content active">
+                <p><strong>【インフレRPGとは】</strong></p>
+                <p>本ゲームは、敵の撃破報酬および自身のステータスが層を進めるごとに<strong>指数関数的にハイパーインフレ</strong>していく破壊的爽快感を楽しむ、シングルプレイ専用のインフレーション・ハクスラRPGです。</p>
+                <p style="margin-top:6px;">限られたリソース（ゴールドやポーション）を効率的に配分し、モンスターのインフレ率を上回る超火力を構築することが目的となります。</p>
+            </div>
+
+            <div id="rule-content-laws" class="rule-tab-content">
+                <p><strong>【戦闘と世界のルール】</strong></p>
+                <ul class="rule-bullet-list">
+                    <li>各層には12体のインフレモンスターが配置されています。12体目を撃破すると次の層へと強制転移します。</li>
+                    <li><strong>対等な時間軸（ディレイ反撃）:</strong> あなたが攻撃を繰り出した1.2秒後、生き残った敵は必ず痛烈な反撃を行います。この反撃モーション中は一切のコマンド介入が封じられます。</li>
+                    <li><strong>敗北の代償:</strong> 戦闘でHPが0になった場合、防衛装置が作戦失敗と判定し、所持ゴールドが強制的に<strong>50%没収（半分に減少）</strong>された上で拠点へ強制送還されます。</li>
+                </ul>
+            </div>
+
+            <div id="rule-content-howto" class="rule-tab-content">
+                <p><strong>【効率的な冒険の進め方】</strong></p>
+                <ul class="rule-bullet-list">
+                    <li><strong>武器ガチャのスタック:</strong> ガチャを引くと攻撃力が加算され、さらに強力な特殊効果が手に入ります。一度手に入れた効果は「装備変更」からいつでも再利用可能です。</li>
+                    <li><strong>永続強化の優先度:</strong> ゴールドが貯まったら「永続強化リスト」を開き、基礎ATKや獲得ゴールド効率をアップさせると、次の周回が圧倒的に楽になります。</li>
+                    <li><strong>オフライン遠征:</strong> ゲームを閉じている間も、あなたの遠征部隊は自動で資金を稼ぎ続けます（30秒以上の離脱で適用）。</li>
+                </ul>
+            </div>
+
+            <div id="rule-content-penalty" class="rule-tab-content">
+                <p style="color:var(--accent-red); font-weight:700;">【禁止されている違法行為】</p>
+                <p>すべての勇者に公平で健全なインフレを楽しんでいただくため、以下の行為を固く禁じます。</p>
+                <ul class="rule-bullet-list" style="color: rgba(239, 68, 68, 0.85);">
+                    <li>外部ツール等によるセーブコード（暗号シグネチャ）の不正改ざん、複製、偽造行為。</li>
+                    <li>自動マクロ等を用いたボタンの超高速不正連打、パケット偽装。</li>
+                </ul>
+                <p style="margin-top:6px;"><strong>🚨 摘発時のペナルティ:</strong></p>
+                <p>不正なデータ構造やシグネチャの不一致（違法行為）が内部のセキュリティゲートで検出された場合、<strong>該当セーブデータは「因果律崩壊」を起こし即座に永久凍結、または全ステータスLv.0への強制初期化ペナルティ</strong>が科されます。</p>
+            </div>
+
+            <div class="modal-buttons" style="margin-top:14px;">
+                <button class="btn-primary" style="width:100%;" onclick="closeModal()">規約を確認して閉じる</button>
+            </div>
+        </div>
+
+        <div id="modal-transfer-hub" class="ui-modal" style="display:none;">
+            <h3>データ連携・引き継ぎ</h3>
+            <div style="display:flex; flex-direction:column; gap:8px;">
+                <button class="btn-primary" onclick="openExportModal()">↑ セーブコードを発行する</button>
+                <button class="btn-secondary" style="padding:12px;" onclick="openImportModal()">↓ セーブコードを読み込む</button>
+                <button class="btn-secondary" style="padding:8px; margin-top:6px; background:transparent;" onclick="closeModal()">閉じる</button>
+            </div>
+        </div>
+
+        <div id="modal-export" class="ui-modal" style="display:none;">
+            <h3>データ書き出し成功</h3>
+            <textarea id="textarea-export-code" class="ui-textarea" readonly></textarea>
+            <div class="modal-buttons">
+                <button class="btn-secondary" onclick="openTransferHub()">戻る</button>
+                <button class="btn-primary" id="btn-copy-code" style="width:auto; padding:8px 16px;" onclick="copyExportCode()">コードをコピー</button>
+            </div>
+        </div>
+
+        <div id="modal-import" class="ui-modal" style="display:none;">
+            <h3>データ読み込み</h3>
+            <textarea id="textarea-import-code" class="ui-textarea" placeholder="ここにコードを貼り付け"></textarea>
+            <div id="import-error-msg" style="color:var(--accent-red); font-size:11px; margin-bottom:10px; display:none;">⚠️ 無効なコードです。</div>
+            <div class="modal-buttons">
+                <button class="btn-secondary" onclick="openTransferHub()">戻る</button>
+                <button class="btn-primary" style="width:auto; padding:8px 16px; background:var(--accent-red); color:#fff;" onclick="confirmImport()">データを復元</button>
+            </div>
+        </div>
+    </div>
+
+    <header>
+        <div class="header-title">
+            <h1>インフレ RPG <span id="loop-text" class="phase-badge">第 01 層 (進行度 1/12)</span></h1>
+        </div>
+        <div class="header-right">
+            <div class="gold-display" id="p-gold">0 G</div>
+            <div style="display:flex; gap:8px;">
+                <button class="theme-toggle-btn" style="background: rgba(59, 130, 246, 0.1); color: var(--accent-blue);" onclick="openWelcomeBoard()">❓ ガイド</button>
+                <button id="theme-toggle" class="theme-toggle-btn" onclick="toggleTheme()">🌓 モード</button>
+            </div>
+        </div>
+    </header>
+
+    <div class="main-viewport">
+        <div id="hub-screen">
+            <div class="hub-top-layout">
+                <div class="player-profile-box">
+                    <div class="profile-meta">
+                        <span id="h-title" class="title-label">同期中...</span>
+                        <span id="h-name" class="name-label">プレイヤー</span>
+                    </div>
+                    <button class="btn-secondary" onclick="openRenameModal()">変更</button>
+                </div>
+
+                <nav class="nav-tabs" id="target-tabs">
+                    <button class="tab-btn active" id="tab-btn-base" onclick="switchTab('base')">拠点ホーム</button>
+                    <button class="tab-btn" id="tab-btn-upgrade" onclick="switchTab('upgrade')">永続強化リスト</button>
+                    <button class="tab-btn" id="tab-btn-store" onclick="switchTab('store')">🏪 アイテムストア</button>
+                    <button class="tab-btn" style="flex:none; width:auto; padding:8px 16px; font-size:12px; background:rgba(46, 204, 113, 0.1); color:var(--accent-mint);" onclick="openTransferHub()">データ連携</button>
+                </nav>
+            </div>
+
+            <div class="hub-content-scroll">
+                <div id="hub-view" class="scene active">
+                    <div class="stats-container">
+                        <div class="stat-card span-2" id="target-hp-card">
+                            <div class="label">体力 (HP)</div>
+                            <div class="value" id="h-hp">100 / 100</div>
+                            <div class="progress-container"><div id="hp-bar-fill" class="progress-fill hp-bar"></div></div>
+                        </div>
+                        <div class="stat-card" id="target-gacha-card" style="background: var(--bg-surface-accent); display: flex; flex-direction: column; justify-content: space-between;">
+                            <div class="label" style="font-size:10px;">武器属性強化ガチャ</div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 4px;">
+                                <span style="font-size:14px; font-weight:700; color:var(--accent-mint); font-family:monospace;" id="h-gacha-cost">50 G</span>
+                                <button onclick="drawGacha()" class="btn-secondary" style="padding:4px 10px; font-size:11px; background:var(--bg-tab-active);">ガチャ</button>
+                            </div>
+                        </div>
+                        <div class="stat-card span-2">
+                            <div class="label">魔力 (MP)</div>
+                            <div class="value" id="h-mp">30 / 30</div>
+                            <div class="progress-container"><div id="mp-bar-fill" class="progress-fill mp-bar"></div></div>
+                        </div>
+                        
+                        <div class="stat-card" style="display:flex; flex-direction:column; justify-content:space-between;">
+                            <div>
+                                <div class="label">攻撃力 (ATK)</div>
+                                <div class="value" id="h-atk" style="color: var(--accent-mint); font-size:20px; margin-top:2px;">15</div>
+                            </div>
+                            <div style="border-top:1px solid var(--border-color); padding-top:4px; margin-top:4px; display:flex; justify-content:space-between; align-items:center;">
+                                <div>
+                                    <span style="font-size:9px; color:var(--text-muted); display:block;">現在装備の効果</span>
+                                    <span id="h-effect-badge" style="font-size:11px; font-weight:600; color:var(--text-dark);">なし ⚔️</span>
+                                </div>
+                                <button class="btn-secondary" style="padding:2px 8px; font-size:10px; background:var(--bg-btn-sec-hover);" onclick="openInventoryModal()">装備変更</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="upgrade-view" class="scene">
+                    <div class="upgrade-grid">
+                        <div class="upgrade-item">
+                            <div class="upgrade-info">
+                                <h3>最大HP強化</h3>
+                                <p>ベースHP +50</p>
+                                <span class="lvl-tag" id="up-hp-lvl">LV. 0</span>
+                            </div>
+                            <div class="upgrade-action">
+                                <span class="cost-tag" id="up-hp-cost">100 G</span>
+                                <button class="btn-secondary" onclick="buyUpgrade('hp')">購入</button>
+                            </div>
+                        </div>
+                        <div class="upgrade-item">
+                            <div class="upgrade-info">
+                                <h3>最大MP強化</h3>
+                                <p>ベースMP +20</p>
+                                <span class="lvl-tag" id="up-mp-lvl">LV. 0</span>
+                            </div>
+                            <div class="upgrade-action">
+                                <span class="cost-tag" id="up-mp-cost">100 G</span>
+                                <button class="btn-secondary" onclick="buyUpgrade('mp')">購入</button>
+                            </div>
+                        </div>
+                        <div class="upgrade-item">
+                            <div class="upgrade-info">
+                                <h3>基礎攻撃力強化</h3>
+                                <p>攻撃力 +10</p>
+                                <span class="lvl-tag" id="up-atk-lvl">LV. 0</span>
+                            </div>
+                            <div class="upgrade-action">
+                                <span class="cost-tag" id="up-atk-cost">150 G</span>
+                                <button class="btn-secondary" onclick="buyUpgrade('atk')">購入</button>
+                            </div>
+                        </div>
+                        <div class="upgrade-item">
+                            <div class="upgrade-info">
+                                <h3>獲得ゴールド補正</h3>
+                                <p>敵撃破時の獲得金 +25%</p>
+                                <span class="lvl-tag" id="up-gold-lvl">LV. 0</span>
+                            </div>
+                            <div class="upgrade-action">
+                                <span class="cost-tag" id="up-gold-cost">300 G</span>
+                                <button class="btn-secondary" onclick="buyUpgrade('gold')">購入</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="store-view" class="scene">
+                    <div class="store-banner">
+                        <div>
+                            <span style="font-size:12px; color:var(--text-muted); display:block;">現在のバッグ状況</span>
+                            <h2 style="font-size:20px; color:var(--text-dark); font-weight:700;">特級ポーションの在庫</h2>
+                        </div>
+                        <div style="text-align:right;">
+                            <span id="store-potion-count" style="font-size:28px; font-weight:800; color:var(--accent-purple); font-family:monospace;">0</span>
+                            <span style="font-size:13px; color:var(--text-muted);"> 個所持</span>
+                        </div>
+                    </div>
+                    <div class="store-grid">
+                        <div class="store-card">
+                            <div class="store-item-icon">🧪</div>
+                            <div class="store-item-details">
+                                <h3>特級リカバリーポーション</h3>
+                                <p>飲むとHPおよびMPが即座に100%全回復する。</p>
+                                <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px;">
+                                    <span style="font-size:13px; font-weight:700; color:var(--accent-mint); font-family:monospace;">50 G / 個</span>
+                                    <button class="btn-secondary" style="padding:4px 12px; font-size:11px; background:var(--accent-purple); color:#fff;" onclick="buyPotion()">1個購入</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="hub-fixed-footer">
+                <button class="rule-trigger-link" onclick="openRulesModal()">ℹ️ このゲームのルールについて</button>
+
+                <button class="btn-secondary" id="use-potion-hub-btn" onclick="usePotion()" style="padding:14px; font-weight:700; font-size:14px; border:1px solid rgba(155, 89, 182, 0.3);">
+                    🧪 ポーションで即時全回復 (所持: <span id="hub-potion-label">0</span>)
+                </button>
+                <button class="btn-primary" id="target-expedition-btn" style="padding:14px; font-size:15px;" onclick="startCombat()">⚔️ 遠征を開始する (全画面)</button>
+            </div>
+        </div>
+
+        <div id="combat-screen">
+            <div class="combat-main-stage">
+                <div class="combat-left-zone">
+                    <div class="unit-card enemy" id="target-enemy-card">
+                        <div class="unit-header"><span>TARGET MONSTER</span><span id="e-atk-val">攻撃力: --</span></div>
+                        <div class="unit-main">
+                            <div class="unit-emoji" id="e-emoji">❓</div>
+                            <div class="unit-info">
+                                <h2 id="e-name">モンスター</h2>
+                                <span id="e-hp-val" style="font-family:monospace; font-size:13px; font-weight:600; color:var(--text-muted);">50 / 50</span>
+                            </div>
+                        </div>
+                        <div class="progress-container" style="height:8px;"><div id="e-hp-bar" class="progress-fill" style="background:var(--accent-red);"></div></div>
+                    </div>
+
+                    <div class="unit-card player-combat-card">
+                        <div class="unit-header"><span>YOUR STATUS</span><span id="c-player-mp-label">MP: 30/30</span></div>
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <div>
+                                <span style="font-size:11px; color:var(--text-muted);">現在の体力</span>
+                                <h3 id="c-player-hp-label" style="font-size:20px; font-family:monospace; color:var(--text-dark);">100 / 100</h3>
+                            </div>
+                            <div style="text-align:right;">
+                                <span style="font-size:11px; color:var(--text-muted);">武器効果: <span id="c-player-effect" style="color:var(--text-dark); font-weight:600;">なし ⚔️</span></span>
+                                <h3 id="c-player-atk-label" style="font-size:18px; font-family:monospace; color:var(--accent-mint);">15 ATK</h3>
+                            </div>
+                        </div>
+                        <div class="progress-container" style="height:6px;"><div id="c-player-hp-bar" class="progress-fill" style="background:var(--accent-red);"></div></div>
+                    </div>
+
+                    <div class="combat-actions-grid" id="target-combat-actions">
+                        <button class="btn-primary" style="padding:16px; font-size:15px;" id="target-btn-attack" onclick="battle('normal')">通常攻撃</button>
+                        <button class="btn-primary" style="padding:16px; font-size:15px; background:var(--accent-blue); color:#ffffff;" id="target-btn-magic" onclick="battle('magic')">スキル (10MP)</button>
+                        <button class="btn-secondary" style="padding:12px; border:1px solid rgba(155,89,182,0.2);" id="target-btn-potion" onclick="usePotionInBattle()">🧪 ポーション (残:<span id="combat-potion-label">0</span>)</button>
+                        <button class="btn-secondary btn-danger" style="padding:12px;" id="target-btn-flee" onclick="endCombatSection()">拠点へ撤退する</button>
+                    </div>
+                </div>
+
+                <div class="combat-right-zone">
+                    <div style="font-size: 11px; color: var(--text-muted); font-weight: 600; margin-bottom: 6px;">📋 リアルタイム戦闘ログ</div>
+                    <div id="log" class="log-box">システム: 戦闘シークエンス待機中...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // --- SECURITY PROTOCOL CORE (v7.3: Cross-Device Compatibility Patch) ---
+    // 💡 画面解像度依存を削除。スペックの違うChromebook同士でも完全互換で連携可能です
+    const _0x_vortex = () => {
+        const d = window.document;
+        const h = (d.referrer.length).toString(16);
+        const f = _0x_vortex.toString().replace(/\s/g, '').length;
+        return h + f.toString(36);
+    };
+    const _0x_gate = (p, t) => {
+        let s = p + t + _0x_vortex();
+        for (let i = 0; i < 3; i++) {
+            s = s.split('').reverse().map((c, j) => String.fromCharCode(c.charCodeAt(0) ^ ((i + j) % 5))).join('');
+            s = btoa(encodeURIComponent(s)).substring(0, 20);
+        }
+        return s.replace(/=/g, '');
+    };
+
+    // --- MAPS ---
+    const EFFECT_DISPLAY_MAP = {
+        "none": "なし ⚔️",
+        "normal_up": "⚔️ 鋼鉄の武器強化",
+        "fire": "🔥 業火の加護",
+        "drain": "🧛 鮮血の吸血",
+        "critical": "⚡ 絶技の会心"
+    };
+
+    const EFFECT_DESC_MAP = {
+        "none": "特殊な効果はありません。標準仕様の武器です。",
+        "normal_up": "パッシブ属性はありませんが、基礎ATKがしっかり強化された状態です。",
+        "fire": "常に攻撃力が1.3倍に跳ね上がります。",
+        "drain": "与えたダメージの10%分の体力を吸収回復します。",
+        "critical": "20%の確率でダメージが3倍になる会心の一撃が放てます。"
+    };
+
+    // --- GAME ENGINE DATA STRUCTURE ---
+    const DEFAULT_P = { 
+        title: "【始まりの旅人】", name: "勇者", 
+        hp: 100, maxHp: 100, mp: 30, maxMp: 30, atk: 15, gold: 0, gachaCount: 0,
+        weaponEffect: "none", 
+        ownedEffects: ["none"], 
+        potions: 2, 
+        up: { hp: 0, mp: 0, atk: 0, gold: 0 }
+    };
+    let p = {...DEFAULT_P};
+    let loopCount = 1;
+    let currentLevel = 0;
+    let enemy = { hp: 0, maxHp: 0, atk: 0, name: "", emoji: "" };
+    let gachaState = "idle"; 
+    let cachedGachaResult = null;
+    let isCombatProcessing = false; 
+
+    const monsters = [
+        { name: "スライム", emoji: "💧", hp: 50, atk: 8, reward: 35 },
+        { name: "ゴブリン", emoji: "👺", hp: 180, atk: 22, reward: 95 },
+        { name: "ウルフ", emoji: "🐺", hp: 350, atk: 35, reward: 180 },
+        { name: "スケルトン", emoji: "💀", hp: 600, atk: 50, reward: 300 },
+        { name: "オーガ", emoji: "👹", hp: 1200, atk: 85, reward: 550 },
+        { name: "ウィッチ", emoji: "🧙‍♀️", hp: 2500, atk: 120, reward: 900 },
+        { name: "ゴーレム", emoji: "🧱", hp: 5500, atk: 180, reward: 1500 },
+        { name: "ヴァンパイア", emoji: "🧛‍♂️", hp: 12000, atk: 300, reward: 3500 },
+        { name: "フェニックス", emoji: "🐦‍🔥", hp: 30000, atk: 550, reward: 7500 },
+        { name: "デーモン", emoji: "👿", hp: 80000, atk: 1000, reward: 18000 },
+        { name: "ドラゴン", emoji: "🐉", hp: 250000, atk: 2200, reward: 50000 },
+        { name: "インフレの王", emoji: "👑", hp: 1000000, atk: 5000, reward: 200000 }
+    ];
+
+    // --- TUTORIALS ---
+    let currentTutMode = "hub"; 
+    let currentTutStep = 0;
+    const hubTutorialSteps = [
+        { targetId: "target-hp-card", title: "❤️ 1. ステータス管理", text: "あなたの体力と魔力です。減少したら、ポーションを使っていつでもその場で全回復が可能です。" },
+        { targetId: "target-gacha-card", title: "🎲 2. 武器属性強化ガチャ", text: "ゴールドを使って武器を即時強化！獲得した効果は上書き排除されず、永久に保管されます！" },
+        { targetId: "tab-btn-store", title: "🏪 3. アイテムストア", text: "新設されたストアです！ここでゴールドを支払い、戦闘や探索に不可欠なポーションを調達できます。" },
+        { targetId: "target-expedition-btn", title: "⚔️ 4. 全画面遠征へ！", text: "準備ができたら「遠征を開始する」をクリック！画面がバトル専用のド爆力モードに切り替わります。" }
+    ];
+    const combatTutorialSteps = [
+        { targetId: "target-enemy-card", title: "👾 1. インフレモンスター", text: "出現した敵のステータスです。周回（層）が上がるにつれて、彼らのステータスは天文学的にインフレしていきます！" },
+        { targetId: "target-btn-attack", title: "⚔️ 2. 攻撃とスキルコマンド", text: "「通常攻撃」またはMPを10消費して3倍のダメージを叩き出す「スキル」を選んで戦いましょう！" },
+        { targetId: "target-btn-potion", title: "🧪 3. 戦地でのポーション使用", text: "戦闘中でもポーションが使用可能です。ピンチになったらターンを消費して安全に全回復しましょう！" }
+    ];
+
+    function openWelcomeBoard() {
+        closeModal(); showOverlay();
+        document.getElementById('modal-welcome').style.display = 'block';
+    }
+    function startGuidedTutorial(mode) {
+        closeModal(); currentTutMode = mode; currentTutStep = 0;
+        document.getElementById('tutorial-overlay').style.display = 'flex';
+        renderTutorialStep();
+    }
+    function renderTutorialStep() {
+        const steps = (currentTutMode === "hub") ? hubTutorialSteps : combatTutorialSteps;
+        const step = steps[currentTutStep];
+        document.querySelectorAll('.tutorial-highlight').forEach(el => el.classList.remove('tutorial-highlight'));
+        
+        const target = document.getElementById(step.targetId);
+        if (target) {
+            target.classList.add('tutorial-highlight');
+            const rect = target.getBoundingClientRect();
+            const container = document.querySelector('.game-container').getBoundingClientRect();
+            const tutCard = document.getElementById('tutorial-card');
+            
+            let topPos = (rect.bottom - container.top) + 12;
+            let leftPos = (rect.left - container.left);
+            if (topPos + 180 > container.height) topPos = (rect.top - container.top) - 150;
+            if (leftPos + 360 > container.width) leftPos = container.width - 380;
+            tutCard.style.top = `${Math.max(10, topPos)}px`;
+            tutCard.style.left = `${Math.max(10, leftPos)}px`;
+        }
+        document.getElementById('tut-title').innerHTML = `💡 ${step.title}`;
+        document.getElementById('tut-text').innerText = step.text;
+        document.getElementById('tut-step').innerText = `${currentTutStep + 1} / ${steps.length}`;
+        document.getElementById('tut-next-btn').innerText = (currentTutStep === steps.length - 1) ? "了解" : "次へ →";
+    }
+    function nextTutorialStep() {
+        const steps = (currentTutMode === "hub") ? hubTutorialSteps : combatTutorialSteps;
+        currentTutStep++;
+        if (currentTutStep < steps.length) {
+            renderTutorialStep();
+        } else {
+            document.querySelectorAll('.tutorial-highlight').forEach(el => el.classList.remove('tutorial-highlight'));
+            document.getElementById('tutorial-overlay').style.display = 'none';
+            if (currentTutMode === "hub") {
+                localStorage.setItem('sys_rpg_first_time', 'completed');
+                triggerToast("⚔️ さあ、遠征を開始しましょう！");
+            } else {
+                localStorage.setItem('sys_rpg_combat_first_time', 'completed');
+                triggerToast("💥 ターン開始！目の前の敵を撃破せよ！");
+            }
+        }
+    }
+
+    function triggerToast(message) {
+        const toast = document.getElementById('toast-notify');
+        toast.innerText = message;
+        toast.style.display = 'block';
+        setTimeout(() => { toast.style.display = 'none'; }, 4000);
+    }
+    function showOverlay() { document.getElementById('custom-modal-overlay').style.display = 'flex'; }
+    function closeModal() {
+        document.getElementById('custom-modal-overlay').style.display = 'none';
+        document.querySelectorAll('.ui-modal').forEach(m => m.style.display = 'none');
+        document.getElementById('import-error-msg').style.display = 'none';
+    }
+    function openRenameModal() {
+        document.getElementById('input-player-name').value = p.name;
+        showOverlay();
+        document.getElementById('modal-name').style.display = 'block';
+    }
+    function confirmRename() {
+        const n = document.getElementById('input-player-name').value.trim();
+        if (!n || n.length > 8) return closeModal();
+        p.name = n; updateDisplay(); saveGame(); closeModal();
+    }
+
+    function openRulesModal() {
+        closeModal();
+        switchRuleTab('summary'); 
+        showOverlay();
+        document.getElementById('modal-game-rules').style.display = 'block';
+    }
+
+    function switchRuleTab(tabName) {
+        document.getElementById('r-tab-summary').classList.remove('active');
+        document.getElementById('r-tab-laws').classList.remove('active');
+        document.getElementById('r-tab-howto').classList.remove('active');
+        document.getElementById('r-tab-penalty').classList.remove('active');
+
+        document.getElementById('rule-content-summary').classList.remove('active');
+        document.getElementById('rule-content-laws').classList.remove('active');
+        document.getElementById('rule-content-howto').classList.remove('active');
+        document.getElementById('rule-content-penalty').classList.remove('active');
+
+        document.getElementById(`r-tab-${tabName}`).classList.add('active');
+        document.getElementById(`rule-content-${tabName}`).classList.add('active');
+    }
+
+    function openInventoryModal() {
+        if (!p.ownedEffects) p.ownedEffects = ["none"];
+        const listContainer = document.getElementById("inventory-container-list");
+        listContainer.innerHTML = "";
+
+        p.ownedEffects.forEach(effectKey => {
+            const isEquipped = (p.weaponEffect === effectKey);
+            const itemDiv = document.createElement("div");
+            itemDiv.className = `inventory-item ${isEquipped ? 'equipped' : ''}`;
+            
+            itemDiv.innerHTML = `
+                <div style="flex: 1; min-width: 0;">
+                    <div style="font-size:13px; font-weight:600; color:var(--text-dark); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${EFFECT_DISPLAY_MAP[effectKey]}</div>
+                    <div style="font-size:10px; color:var(--text-muted); margin-top:2px;">${EFFECT_DESC_MAP[effectKey]}</div>
+                </div>
+                <div class="equip-status-container">
+                    ${isEquipped ? 
+                        `<span class="equipped-badge">装備中</span>` : 
+                        `<button class="btn-secondary" style="padding:4px 10px; font-size:11px;" onclick="equipEffect('${effectKey}')">装備する</button>`
+                    }
+                </div>
+            `;
+            listContainer.appendChild(itemDiv);
+        });
+
+        showOverlay();
+        document.getElementById('modal-inventory').style.display = 'block';
+    }
+
+    function equipEffect(effectKey) {
+        p.weaponEffect = effectKey;
+        triggerToast(`💼 ${EFFECT_DISPLAY_MAP[effectKey]} を装備しました！`);
+        addLog(`>> 装備を変更: ${EFFECT_DISPLAY_MAP[effectKey]}`);
+        closeModal();
+        updateDisplay();
+        saveGame();
+    }
+
+    function openTransferHub() {
+        closeModal(); showOverlay();
+        document.getElementById('modal-transfer-hub').style.display = 'block';
+    }
+    function openExportModal() {
+        try {
+            const logs = Array.from(document.getElementById("log").children).slice(0, 5).map(el => el.innerHTML);
+            const payload = { p, l: loopCount, lg: logs, ts: Date.now().toString(36), v: "7.3-patch" };
+            const raw = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
+            const sig = _0x_gate(raw, payload.ts);
+            document.getElementById('textarea-export-code').value = `${payload.ts}.${raw}.${sig}`;
+            document.getElementById('modal-export').style.display = 'block';
+        } catch(e) { addLog(">> エクスポートエラー"); }
+    }
+    function copyExportCode() {
+        const copyText = document.getElementById("textarea-export-code");
+        copyText.select();
+        navigator.clipboard.writeText(copyText.value).then(() => {
+            document.getElementById('btn-copy-code').innerText = "コピー完了！";
+        });
+    }
+    function openImportModal() {
+        document.getElementById('textarea-import-code').value = "";
+        document.getElementById('import-error-msg').style.display = 'none';
+        document.getElementById('modal-transfer-hub').style.display = 'none';
+        document.getElementById('modal-import').style.display = 'block';
+    }
+    function confirmImport() {
+        const code = document.getElementById('textarea-import-code').value.trim();
+        if (!code) return;
+        try {
+            const [ts, raw, sig] = code.split('.');
+            if (sig !== _0x_gate(raw, ts)) throw 0;
+            const data = JSON.parse(decodeURIComponent(escape(atob(raw))));
+            p = data.p; loopCount = data.l;
+            if (p.potions === undefined) p.potions = 2; 
+            localStorage.setItem('sys_rpg_import_success', '1');
+            saveGame(); location.reload();
+        } catch (e) { document.getElementById('import-error-msg').style.display = 'block'; }
+    }
+    function toggleTheme() {
+        const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
+        let newTheme = (currentTheme === 'dark') ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', newTheme);
+        localStorage.setItem('sys_rpg_theme', newTheme);
+    }
+    function initTheme() {
+        const savedTheme = localStorage.getItem('sys_rpg_theme') || 'dark';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+    }
+    
+    function switchTab(tab) {
+        document.getElementById('hub-view').style.display = 'none';
+        document.getElementById('upgrade-view').style.display = 'none';
+        document.getElementById('store-view').style.display = 'none';
+        
+        document.getElementById('tab-btn-base').classList.remove('active');
+        document.getElementById('tab-btn-upgrade').classList.remove('active');
+        document.getElementById('tab-btn-store').classList.remove('active');
+        
+        if(tab === 'base') {
+            document.getElementById('hub-view').style.display = 'block';
+            document.getElementById('tab-btn-base').classList.add('active');
+        } else if (tab === 'upgrade') {
+            document.getElementById('upgrade-view').style.display = 'block';
+            document.getElementById('tab-btn-upgrade').classList.add('active');
+        } else if (tab === 'store') {
+            document.getElementById('store-view').style.display = 'block';
+            document.getElementById('tab-btn-store').classList.add('active');
+        }
+        updateDisplay();
+    }
+
+    function buyPotion() {
+        const cost = 50;
+        if(p.gold < cost) return addLog(">> ゴールドが不足しています");
+        p.gold -= cost;
+        p.potions = (p.potions || 0) + 1;
+        triggerToast("🧪 特級リカバリーポーションを1個購入しました！");
+        addLog(`>> ストア: ポーションを1個購入しました (-50G)`);
+        updateDisplay(); saveGame();
+    }
+
+    function usePotion() {
+        if((p.potions || 0) <= 0) return addLog(">> ポーションを持っていません。ストアで購入してください。");
+        if(p.hp >= p.maxHp && p.mp >= p.maxMp) return addLog(">> すでにステータスは満タンです。");
+        
+        p.potions--;
+        p.hp = p.maxHp;
+        p.mp = p.maxMp;
+        triggerToast("✨ ポーションをグイッと飲み干し、完全回復した！");
+        addLog(">> 🧪 ポーションを使用してHP/MPが最大まで回復しました。");
+        updateDisplay(); saveGame();
+    }
+
+    function usePotionInBattle() {
+        if (isCombatProcessing) return; 
+        if((p.potions || 0) <= 0) return addLog(">> ポーションの在庫がありません！");
+        if(p.hp >= p.maxHp && p.mp >= p.maxMp) return addLog(">> すでに全回復しています。");
+        
+        p.potions--;
+        p.hp = p.maxHp;
+        p.mp = p.maxMp;
+        addLog(">> 🧪 戦地でポーションを服用！HPとMPが100%全回復した！");
+        updateDisplay();
+        
+        setCombatButtonsDisabled(true);
+        isCombatProcessing = true;
+        
+        setTimeout(() => {
+            p.hp = Math.max(0, p.hp - enemy.atk);
+            addLog(`💥 ポーション使用直後の隙を突かれた！被ダメ: ${Math.floor(enemy.atk)}`);
+            
+            if (p.hp <= 0) { 
+                p.gold = Math.floor(p.gold/2); p.hp = 1; 
+                addLog("🚨 作戦失敗！壊滅のため資金が半分になりました。拠点に戻ります。");
+                endCombatSection();
+            }
+            
+            isCombatProcessing = false;
+            setCombatButtonsDisabled(false);
+            updateDisplay(); saveGame();
+        }, 1200);
+    }
+
+    function buyUpgrade(type) {
+        const baseCosts = { hp: 100, mp: 100, atk: 150, gold: 300 };
+        const multiplier = 1.6;
+        const cost = Math.floor(baseCosts[type] * Math.pow(multiplier, p.up[type]));
+        
+        if(p.gold < cost) return addLog(">> ゴールドが不足しています");
+        p.gold -= cost; p.up[type]++;
+        if(type === 'hp') p.maxHp += 50;
+        if(type === 'mp') p.maxMp += 20;
+        if(type === 'atk') p.atk += 10;
+        
+        addLog(`>> システム強化に成功: ${type.toUpperCase()}`);
+        updateDisplay(); saveGame();
+    }
+
+    function updateDisplay() {
+        if (!p.weaponEffect) p.weaponEffect = "none";
+        if (!p.ownedEffects) p.ownedEffects = ["none"];
+        if (p.potions === undefined) p.potions = 2;
+
+        document.getElementById("h-name").innerText = p.name;
+        document.getElementById("h-title").innerText = p.title;
+        document.getElementById("p-gold").innerText = `${Math.floor(p.gold)} G`;
+        
+        const totalMonsters = monsters.length;
+        document.getElementById("loop-text").innerText = `第 ${loopCount.toString().padStart(2, '0')} 層 (${currentLevel + 1}/${totalMonsters})`;
+        
+        document.getElementById("h-hp").innerText = `${Math.floor(p.hp)} / ${p.maxHp}`;
+        document.getElementById("hp-bar-fill").style.width = (p.hp/p.maxHp*100) + "%";
+        document.getElementById("h-mp").innerText = `${Math.floor(p.mp)} / ${p.maxMp}`;
+        document.getElementById("mp-bar-fill").style.width = (p.mp/p.maxMp*100) + "%";
+        document.getElementById("h-atk").innerText = p.atk;
+        document.getElementById("h-gacha-cost").innerText = `${50 + (p.gachaCount * 25)} G`;
+
+        const effectName = EFFECT_DISPLAY_MAP[p.weaponEffect] || "なし ⚔️";
+        document.getElementById("h-effect-badge").innerText = effectName;
+        document.getElementById("c-player-effect").innerText = effectName;
+
+        document.getElementById("c-player-hp-label").innerText = `${Math.floor(p.hp)} / ${p.maxHp}`;
+        document.getElementById("c-player-mp-label").innerText = `MP: ${Math.floor(p.mp)} / ${p.maxMp}`;
+        document.getElementById("c-player-atk-label").innerText = `${p.atk} ATK`;
+        document.getElementById("c-player-hp-bar").style.width = (p.hp/p.maxHp*100) + "%";
+
+        document.getElementById("store-potion-count").innerText = p.potions;
+        document.getElementById("hub-potion-label").innerText = p.potions;
+        document.getElementById("combat-potion-label").innerText = p.potions;
+
+        const baseCosts = { hp: 100, mp: 100, atk: 150, gold: 300 };
+        ['hp', 'mp', 'atk', 'gold'].forEach(t => {
+            const multiplier = 1.6;
+            const cost = Math.floor(baseCosts[t] * Math.pow(multiplier, p.up[t]));
+            const targetCostEl = document.getElementById(`up-${t}-cost`);
+            const targetLvlEl = document.getElementById(`up-${t}-lvl`);
+            
+            if (targetCostEl && targetLvlEl) {
+                targetCostEl.innerText = `${cost} G`;
+                targetLvlEl.innerText = `LV. ${p.up[t]}`;
+            }
+        });
+
+        document.getElementById("e-name").innerText = enemy.name || "---";
+        document.getElementById("e-emoji").innerText = enemy.emoji || "❓";
+        document.getElementById("e-hp-val").innerText = `${Math.floor(enemy.hp)} / ${Math.floor(enemy.maxHp)}`;
+        document.getElementById("e-hp-bar").style.width = (enemy.hp/(enemy.maxHp||1)*100) + "%";
+        document.getElementById("e-atk-val").innerText = `攻撃力: ${Math.floor(enemy.atk)}`;
+    }
+
+    function setCombatButtonsDisabled(disabled) {
+        document.getElementById("target-btn-attack").disabled = disabled;
+        document.getElementById("target-btn-magic").disabled = disabled;
+        document.getElementById("target-btn-potion").disabled = disabled;
+        document.getElementById("target-btn-flee").disabled = disabled;
+    }
+
+    function startCombat() {
+        currentLevel = 0; initEnemy(); 
+        isCombatProcessing = false;
+        setCombatButtonsDisabled(false);
+        document.getElementById('hub-screen').style.display = 'none';
+        document.getElementById('combat-screen').style.display = 'flex';
+        if (!localStorage.getItem('sys_rpg_combat_first_time')) {
+            setTimeout(() => startGuidedTutorial('combat'), 400);
+        }
+    }
+
+    function endCombatSection() {
+        isCombatProcessing = false;
+        setCombatButtonsDisabled(false);
+        document.getElementById('combat-screen').style.display = 'none';
+        document.getElementById('hub-screen').style.display = 'flex';
+        addLog(">> 拠点に無事帰還しました。");
+        updateDisplay();
+    }
+
+    function initEnemy() {
+        const b = monsters[currentLevel];
+        const inflationMultiplier = Math.pow(1.8, loopCount - 1);
+        enemy = { 
+            name: b.name, emoji: b.emoji, 
+            hp: Math.floor(b.hp * inflationMultiplier), maxHp: Math.floor(b.hp * inflationMultiplier), 
+            atk: Math.floor(b.atk * inflationMultiplier), reward: Math.floor(b.reward * inflationMultiplier) 
+        };
+        updateDisplay();
+    }
+
+    function battle(type) {
+        if (isCombatProcessing) return; 
+
+        let d = (type === 'magic') ? p.atk * 3 : p.atk;
+        if (type === 'magic') { 
+            if (p.mp < 10) return addLog(">> MPが不足しています"); 
+            p.mp -= 10; 
+        }
+
+        if (type === 'normal' && p.weaponEffect === "critical") {
+            if (Math.random() < 0.20) { 
+                d = d * 3;
+                addLog("⚡【会心発動】致命的なインフレ追撃！ダメージ3倍！");
+            }
+        }
+        if (p.weaponEffect === "fire") {
+            d = d * 1.3; 
+        }
+
+        enemy.hp = Math.max(0, enemy.hp - d);
+        addLog(`⚔️ ${enemy.name}に ${Math.floor(d)} のダメージ！`);
+        
+        if (p.weaponEffect === "drain") {
+            let healAmount = Math.floor(d * 0.10);
+            p.hp = Math.min(p.maxHp, p.hp + healAmount);
+            addLog(`🧛【吸血】敵の生命力を吸収: +${healAmount} HP`);
+        }
+
+        updateDisplay();
+
+        if (enemy.hp <= 0) {
+            let bonus = 1 + (p.up.gold * 0.25);
+            let gain = Math.floor(enemy.reward * bonus);
+            p.gold += gain;
+            addLog(`🏆 ${enemy.name}を撃破！ +${gain}G獲得`);
+            currentLevel++;
+            
+            if (currentLevel >= monsters.length) {
+                loopCount++; currentLevel = 0; 
+                addLog("✨ [階層クリア] 世界の境界を突破！"); 
+                endCombatSection();
+            } else { 
+                initEnemy(); 
+            }
+            saveGame();
+        } else {
+            isCombatProcessing = true;
+            setCombatButtonsDisabled(true); 
+            
+            addLog(`⏳ ${enemy.name}が身構えている...`);
+
+            setTimeout(() => {
+                if (document.getElementById('combat-screen').style.display === 'none') {
+                    isCombatProcessing = false;
+                    return;
+                }
+
+                p.hp = Math.max(0, p.hp - enemy.atk);
+                addLog(`💥 ${enemy.name}の反撃！被ダメ: ${Math.floor(enemy.atk)}`);
+                
+                if (p.hp <= 0) { 
+                    p.gold = Math.floor(p.gold/2); p.hp = 1; 
+                    addLog("🚨 作戦失敗！壊滅のため資金が半分になりました。拠点でポーションを補給してください。");
+                    endCombatSection();
+                } else {
+                    isCombatProcessing = false;
+                    setCombatButtonsDisabled(false); 
+                }
+                
+                updateDisplay(); 
+                saveGame();
+            }, 1200); 
+        }
+    }
+
+    function drawGacha() {
+        if (gachaState !== "idle") return;
+        const c = 50 + (p.gachaCount * 25);
+        if (p.gold < c) return addLog(">>ゴールドが不足しています");
+        p.gold -= c; p.gachaCount++;
+
+        const isCritical = Math.random() > 0.9;
+        let atkGain = 0; let hpGain = 0;
+
+        if (isCritical) {
+            atkGain = 15 * loopCount; hpGain = 25 * loopCount;
+            p.atk += atkGain; p.maxHp += hpGain;
+        } else {
+            atkGain = 4 * loopCount; p.atk += atkGain;
+        }
+
+        cachedGachaResult = { isCritical, atkGain, hpGain };
+        gachaState = "charging";
+        
+        const theater = document.getElementById("gacha-theater");
+        const inner = document.getElementById("gacha-card-inner");
+        const orb = document.getElementById("gacha-orb");
+        const hint = document.getElementById("gacha-theater-hint");
+
+        inner.classList.remove("flipped");
+        inner.classList.add("animate-charge");
+        hint.innerText = "チャージ中... (タップでスキップ)";
+        orb.style.background = isCritical ? "var(--accent-red)" : "var(--accent-mint)";
+        theater.style.display = "flex";
+
+        cachedGachaResult.timeoutId = setTimeout(() => { revealGachaResult(); }, 1200);
+        updateDisplay(); saveGame();
+    }
+
+    function revealGachaResult() {
+        if (gachaState !== "charging") return;
+        gachaState = "revealed";
+        if (cachedGachaResult.timeoutId) clearTimeout(cachedGachaResult.timeoutId);
+
+        const inner = document.getElementById("gacha-card-inner");
+        const flash = document.getElementById("gacha-flash");
+        const badge = document.getElementById("gacha-res-rarity");
+        const icon = document.getElementById("gacha-res-icon");
+        const name = document.getElementById("gacha-res-name");
+        const stat = document.getElementById("gacha-res-stat");
+        const hint = document.getElementById("gacha-theater-hint");
+
+        inner.classList.remove("animate-charge");
+        inner.classList.add("flipped");
+        flash.classList.remove("animate-flash");
+        void flash.offsetWidth; 
+        flash.classList.add("animate-flash");
+
+        const res = cachedGachaResult;
+        if (!p.ownedEffects) p.ownedEffects = ["none"];
+        let rolledEffect = "normal_up"; 
+
+        let effectRoll = Math.random();
+        if (res.isCritical) {
+            rolledEffect = (effectRoll > 0.5) ? "critical" : "drain";
+        } else {
+            if (effectRoll < 0.15) {
+                rolledEffect = "fire";
+            }
+        }
+
+        if (!p.ownedEffects.includes(rolledEffect)) {
+            p.ownedEffects.push(rolledEffect);
+            setTimeout(() => { triggerToast(`🎉 新たな武器効果 [ ${EFFECT_DISPLAY_MAP[rolledEffect]} ] を兵器庫リストに保管しました！`); }, 500);
+        }
+        
+        p.weaponEffect = rolledEffect;
+
+        if (res.isCritical) {
+            badge.innerText = "CRITICAL!!"; badge.style.background = "rgba(239, 68, 68, 0.2)"; badge.style.color = "var(--accent-red)";
+            if (rolledEffect === "critical") {
+                icon.innerText = "⚡"; name.innerText = "裁きの絶技・会心覚醒"; stat.innerText = `+${res.atkGain} ATK / 会心率+20%`;
+            } else {
+                icon.innerText = "🧛"; name.innerText = "神話・吸血の魔剣"; stat.innerText = `+${res.atkGain} ATK / 与ダメ10%吸収`;
+            }
+            addLog(`>> [ガチャ] クリティカル大成功！[${EFFECT_DISPLAY_MAP[rolledEffect]}] を装備。`);
+        } else {
+            badge.innerText = "SUCCESS"; badge.style.background = "rgba(46, 204, 113, 0.2)"; badge.style.color = "var(--accent-mint)";
+            if (rolledEffect === "fire") {
+                icon.innerText = "🔥"; name.innerText = "業火の鋼鉄剣"; stat.innerText = `+${res.atkGain} ATK / 業火の追撃(1.3倍)`;
+                addLog(">> [ガチャ] 属性解放！[業火の加護] を装備しました。");
+            } else {
+                icon.innerText = "⚔️"; 
+                name.innerText = "鋼鉄の武器強化";
+                stat.innerText = `+${res.atkGain} ATK`;
+                addLog(`>> [ガチャ] 武器を純粋強化: +${res.atkGain} ATK を上乗せ。`);
+            }
+        }
+        hint.innerText = "画面をタップして閉じる";
+        updateDisplay();
+        saveGame();
+    }
+
+    function skipOrCloseGacha() {
+        if (gachaState === "charging") { revealGachaResult(); } 
+        else if (gachaState === "revealed") {
+            document.getElementById("gacha-theater").style.display = "none";
+            document.getElementById("gacha-card-inner").classList.remove("flipped");
+            gachaState = "idle"; cachedGachaResult = null;
+        }
+    }
+
+    function saveGame() {
+        if (!p.weaponEffect) p.weaponEffect = "none";
+        if (!p.ownedEffects) p.ownedEffects = ["none"];
+        if (p.potions === undefined) p.potions = 2;
+
+        const saveData = { p, loopCount, lastSaveTime: Date.now() };
+        const core = btoa(unescape(encodeURIComponent(JSON.stringify(saveData))));
+        localStorage.setItem('sys_rpg_minimal_v293', `${core}.${_0x_gate(core, "local")}`);
+    }
+
+    function loadGame() {
+        const saved = localStorage.getItem('sys_rpg_minimal_v293');
+        if (saved) {
+            const [core, hash] = saved.split('.');
+            if (hash === _0x_gate(core, "local")) {
+                const data = JSON.parse(decodeURIComponent(escape(atob(core))));
+                
+                const currentEffect = (data.p && data.p.weaponEffect) ? data.p.weaponEffect : "none";
+                const currentOwned = (data.p && data.p.ownedEffects) ? data.p.ownedEffects : ["none"];
+                
+                p = {...DEFAULT_P, ...data.p}; 
+                p.weaponEffect = currentEffect; 
+                p.ownedEffects = currentOwned;
+                if (p.potions === undefined) p.potions = 2;
+                if (!p.ownedEffects.includes("none")) p.ownedEffects.unshift("none");
+                
+                loopCount = data.loopCount || 1;
+
+                const lastExitTime = localStorage.getItem('sys_rpg_actual_exit_time');
+                if (lastExitTime) {
+                    const actualExitTimestamp = parseInt(lastExitTime, 10);
+                    const now = Date.now();
+                    const elapsedSeconds = Math.floor((now - actualExitTimestamp) / 1000);
+
+                    if (elapsedSeconds >= 30) { 
+                        const cappedSeconds = Math.min(elapsedSeconds, 21600); 
+                        const goldPerSecond = loopCount * 0.5;
+                        const offlineGoldGain = Math.floor(cappedSeconds * goldPerSecond);
+
+                        if (offlineGoldGain > 0) {
+                            p.gold += offlineGoldGain;
+                            const displayMinutes = Math.floor(cappedSeconds / 60);
+                            setTimeout(() => {
+                                triggerToast(`💰 留守中報酬: ${displayMinutes}分間の放置で ${offlineGoldGain} G 獲得！`);
+                                addLog(`>> 【オフライン報酬】遠征部隊が自動帰還しました。+${offlineGoldGain}G 獲得`);
+                                updateDisplay();
+                                saveGame(); 
+                            }, 1000);
+                        }
+                    }
+                }
+            }
+        }
+        
+        localStorage.removeItem('sys_rpg_actual_exit_time');
+        saveGame();
+        
+        updateDisplay(); 
+        if (localStorage.getItem('sys_rpg_import_success') === '1') {
+            localStorage.removeItem('sys_rpg_import_success');
+            triggerToast("🎉 セーブデータの復元が完了しました！");
+        }
+        if (!localStorage.getItem('sys_rpg_first_time')) {
+            setTimeout(openWelcomeBoard, 600);
+        }
+    }
+
+    window.addEventListener('beforeunload', () => {
+        localStorage.setItem('sys_rpg_actual_exit_time', Date.now().toString());
+        saveGame();
+    });
+
+    function addLog(m) {
+        const el = document.getElementById('log');
+        if(el) el.innerHTML = `<div>${m}</div>` + el.innerHTML;
+    }
+
+    initTheme(); loadGame();
+</script>
+</body>
+</html>
